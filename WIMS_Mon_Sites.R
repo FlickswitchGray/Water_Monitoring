@@ -21,6 +21,32 @@ library(leaflet)
   api <- api$items 
   str(api) #Check data type so we know what we're working with, our api is type dataframe
 
+# Get site names form spatial area
+  
+  #Load spatial data
+  
+ # catch <- read_sf("/dbfs/mnt/lab/unrestricted/harry.gray@environment-agency.gov.uk/Interim_WFD_2022.shp")# Catchment shapefiles
+  #CAT_PHR <- catch[catch$OPCAT_NAME %in% c("Poole Harbour Rivers"),]
+  
+  catch_Trac <- read_sf("/dbfs/FileStore/WSX_HGray/WFD_Transitional_Water_Bodies_Cycle_3.shp") 
+  CAT <- catch_Trac[catch_Trac$OPCAT_NAME == "Poole Harbour Rivers TraC",] 
+  
+#  CAT <- rbind(CAT_PHR,CAT_PH)
+  
+  CAT <- st_transform(CAT, 4326)
+  
+  # Transform to sf object
+  
+  apio <- api %>%  st_as_sf(coords= c("long","lat"),
+                     crs=st_crs(4326))
+  
+  clip <- apio[CAT,]
+
+  library(leaflet)
+
+  leaflet(clip) %>% addProviderTiles(providers$Esri) %>% addCircles()
+
+  source("WIMS_All_Deters.R")
 # Load in area you wish to filter by
   BA <- read_sf("/dbfs/mnt/lab/unrestricted/harry.gray@environment-agency.gov.uk/Interim_WFD_2022.shp")  %>% st_transform(4326)
 
